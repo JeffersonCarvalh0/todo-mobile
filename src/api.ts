@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 const server = axios.create({
   baseURL:
     process.env.NODE_ENV === 'development'
-      ? 'http://localhost:8000/api'
+      ? 'http://192.168.0.107:8000/api' // localhost doesnt work
       : 'https://todo-app-server0.herokuapp.com/api',
 });
 

@@ -4,8 +4,7 @@ import {View} from 'react-native';
 import {Subheading, TextInput, Button, HelperText} from 'react-native-paper';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
-import AsyncStorage from '@react-native-community/async-storage';
-import {Link, Redirect} from 'react-router-native';
+import {Redirect} from 'react-router-native';
 
 import FullLoading from '../components/FullLoading';
 import server from '../api';
@@ -18,41 +17,34 @@ const ApiErrorMessage = styled(Subheading)`
   color: red;
 `;
 
-const AccountCreatedMessage = styled(Subheading)`
-  color: green;
-`;
+const SignUp = () => {
+  const [success, setSuccess] = useState(false);
 
-interface Props {
-  location?: {
-    state: {
-      accountCreated: boolean;
-      fetchUserDataErrorMessage: string;
-    };
-  };
-}
-
-const Login = (props: Props) => {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  return loggedIn ? (
-    <Redirect to="/dashboard" />
+  return success ? (
+    <Redirect to={{pathname: '/login', state: {accountCreated: true}}} />
   ) : (
     <Formik
-      initialValues={{email: '', password: ''}}
+      initialValues={{name: '', email: '', password: '', confirmPassword: ''}}
       validationSchema={Yup.object({
+        name: Yup.string().required(),
         email: Yup.string().required().email(),
         password: Yup.string().required(),
+        confirmPassword: Yup.string().oneOf(
+          [Yup.ref('password'), null],
+          "Passwords don't match",
+        ),
       })}
       onSubmit={async (values, {setStatus}) => {
         return server
-          .post('/login', {
+          .post('/user', {
+            name: values.name,
             email: values.email,
             password: values.password,
           })
-          .then(async (response) => {
-            const token = response.data.data.token;
-            await AsyncStorage.setItem('token', token);
-            setLoggedIn(true);
+          .then((response) => {
+            if (response.status === 200) {
+              setSuccess(true);
+            }
           })
           .catch((error) => {
             if (error.response) {
@@ -63,14 +55,23 @@ const Login = (props: Props) => {
       {(formik) => (
         <>
           <FullLoading show={formik.isSubmitting} />
-          {props.location &&
-            props.location.state &&
-            props.location.state.accountCreated && (
-              <AccountCreatedMessage>
-                Account successfully created!
-              </AccountCreatedMessage>
-            )}
           {formik.status && <ApiErrorMessage>{formik.status}</ApiErrorMessage>}
+          <View>
+            <TextInput
+              mode="outlined"
+              label="Name"
+              onChangeText={formik.handleChange('name')}
+              onBlur={formik.handleBlur('name')}
+              value={formik.values.name}
+            />
+            <HelperText
+              type="error"
+              visible={formik.touched.name && formik.errors.name}>
+              {formik.errors.name}
+            </HelperText>
+            <Padding />
+          </View>
+
           <View>
             <TextInput
               mode="outlined"
@@ -104,18 +105,33 @@ const Login = (props: Props) => {
             <Padding />
           </View>
 
+          <View>
+            <TextInput
+              secureTextEntry
+              mode="outlined"
+              label="Confirm password"
+              onChangeText={formik.handleChange('confirmPassword')}
+              onBlur={formik.handleBlur('confirmPassword')}
+              value={formik.values.confirmPassword}
+            />
+            <HelperText
+              type="error"
+              visible={
+                formik.touched.confirmPassword && formik.errors.confirmPassword
+              }>
+              {formik.errors.confirmPassword}
+            </HelperText>
+            <Padding />
+          </View>
+
           <Button mode="contained" onPress={formik.handleSubmit}>
-            Login
+            Sign Up
           </Button>
           <Padding value="5px" />
-
-          <Link to="/signup">
-            <Button mode="contained"> Sign Up </Button>
-          </Link>
         </>
       )}
     </Formik>
   );
 };
 
-export default Login;
+export default SignUp;
