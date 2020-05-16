@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {Card, IconButton, Text} from 'react-native-paper';
+
+import EditTodoModal from './EditTodoModal';
 
 const StyledCard = styled(Card)`
   margin-bottom: 20px;
@@ -13,21 +15,38 @@ interface Props {
     id?: number;
     done: boolean;
   };
-  onEditCancel?: Function;
-  onSave?: Function;
+  onEditCancel: Function;
+  onSave: Function;
 }
 
-const TodoCard = ({todo}: Props) => {
+const TodoCard = ({todo, onSave, onEditCancel}: Props) => {
+  const [showEditModal, setShowEditModal] = useState(false);
+
   return (
-    <StyledCard>
-      <Card.Title
-        title={todo.title}
-        right={(props) => <IconButton {...props} icon="pencil" />}
+    <>
+      <EditTodoModal
+        todo={todo}
+        close={() => setShowEditModal(false)}
+        isVisible={showEditModal}
+        onSave={onSave}
+        onEditCancel={onEditCancel}
       />
-      <Card.Content>
-        <Text>{todo.description}</Text>
-      </Card.Content>
-    </StyledCard>
+      <StyledCard>
+        <Card.Title
+          title={todo.title}
+          right={(props) => (
+            <IconButton
+              {...props}
+              icon="pencil"
+              onPress={() => setShowEditModal(true)}
+            />
+          )}
+        />
+        <Card.Content>
+          <Text>{todo.description}</Text>
+        </Card.Content>
+      </StyledCard>
+    </>
   );
 };
 

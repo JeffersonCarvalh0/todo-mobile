@@ -2,12 +2,10 @@ import React, {useState, useEffect} from 'react';
 import {View, ScrollView} from 'react-native';
 import {
   withTheme,
-  Button,
   IconButton,
   Title,
   Subheading,
   TouchableRipple,
-  Text,
 } from 'react-native-paper';
 import styled from 'styled-components/native';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -16,6 +14,7 @@ import {Redirect} from 'react-router-native';
 import server from '../api';
 import FullLoading from '../components/FullLoading';
 import TodoCard from '../components/TodoCard';
+import EditTodoModal from '../components/EditTodoModal';
 
 const Container = styled(ScrollView)`
   flex-direction: column;
@@ -161,23 +160,19 @@ const Dashboard = () => {
           </Tab>
         </TabsContainer>
 
-        {newTodoBeingAdded ? (
-          <TodoCard
-            todo={{title: '', description: '', done: false}}
-            onEditCancel={() => setNewTodoBeingAdded(false)}
-            onSave={() => {
-              setNewTodoBeingAdded(false);
-              toggleRefresh();
-            }}
+        <EditTodoModal
+          todo={{title: '', description: '', done: false}}
+          isVisible={newTodoBeingAdded}
+          close={() => setNewTodoBeingAdded(false)}
+          onSave={toggleRefresh}
+        />
+
+        {!showDoneTodos && (
+          <AddIcon
+            icon="plus-circle"
+            size={48}
+            onPress={() => setNewTodoBeingAdded(true)}
           />
-        ) : (
-          !showDoneTodos && (
-            <AddIcon
-              icon="plus-circle"
-              size={48}
-              onPress={() => setNewTodoBeingAdded(true)}
-            />
-          )
         )}
 
         {todos.length === 0 ? (
