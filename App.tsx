@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {SafeAreaView, StatusBar, View, Text} from 'react-native';
-import {withTheme} from 'react-native-paper';
+import {withTheme, Button} from 'react-native-paper';
 import {Switch, Route, Redirect, BackButton} from 'react-router-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import {Link} from 'react-router-native';
 
 import Login from './src/pages/Login';
 import SignUp from './src/pages/SignUp';
@@ -45,6 +46,15 @@ const App = () => {
             <Route path="/signup" component={SignUp} />
             <Route path="/dashboard">
               <Text>Dashboard</Text>
+              <Link to="/login" replace>
+                <Button
+                  mode="contained"
+                  onPress={async () => {
+                    await AsyncStorage.setItem('token', '');
+                  }}>
+                  Logoff
+                </Button>
+              </Link>
             </Route>
           </Switch>
         </Container>

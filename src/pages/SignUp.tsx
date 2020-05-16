@@ -42,7 +42,7 @@ const SignUp = () => {
             password: values.password,
           })
           .then((response) => {
-            if (response.status === 200) {
+            if (response.status === 201) {
               setSuccess(true);
             }
           })
