@@ -16,7 +16,7 @@ const theme = {
     background: '#032B43',
     primary: '#2EC4B6',
     // accent: '#2EC4B6',
-    surface: '#eafaf9',
+    // surface: '#eafaf9',
   },
 };
 
